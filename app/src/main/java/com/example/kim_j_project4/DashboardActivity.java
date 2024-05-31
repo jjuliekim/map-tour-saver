@@ -105,14 +105,12 @@ public class DashboardActivity extends AppCompatActivity implements OnMapReadyCa
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-
         // check permissions
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, 1);
             return;
         }
-
         // get user's current location and move camera there
         mMap.setMyLocationEnabled(true);
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, new LocationListener() {
@@ -124,10 +122,16 @@ public class DashboardActivity extends AppCompatActivity implements OnMapReadyCa
                 locationManager.removeUpdates(this);
             }
         });
+        // restore marked locations
+        ArrayList<LatLng> savedLocations = dashboardViewModel.getLocations().getValue();
+        if (savedLocations != null) {
+            for (LatLng location : savedLocations) {
+                mMap.addMarker(new MarkerOptions().position(location));
+            }
+        }
 
         // allow users to mark locations of interest on the map (store that in ViewModel)
         mMap.setOnMapClickListener(location -> dashboardViewModel.addLocation(location));
-
     }
 
     // save tour information
@@ -175,6 +179,8 @@ public class DashboardActivity extends AppCompatActivity implements OnMapReadyCa
         // check if file exists
         File file = new File(getFilesDir(), username + ".json");
         if (!file.exists()) {
+            tourList = new ArrayList<>();
+            Log.i("HERE DASHBOARD", "no json file yet");
             return;
         }
         try {
