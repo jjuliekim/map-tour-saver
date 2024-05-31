@@ -3,7 +3,6 @@ package com.example.kim_j_project4;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -26,7 +25,6 @@ public class LoginActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-        Log.i("HERE", "log in screen");
     }
 
     // handles process when log in button is clicked
@@ -46,7 +44,7 @@ public class LoginActivity extends AppCompatActivity {
 
         // check if username already exists
         SharedPreferences sharedPreferences = getSharedPreferences("UserData", MODE_PRIVATE);
-        Intent myIntent = new Intent(LoginActivity.this, MainPageActivity.class);
+        Intent myIntent = new Intent(LoginActivity.this, DashboardActivity.class);
         if (sharedPreferences.contains(username)) {
             // validate password
             String storedPw = sharedPreferences.getString(username + "_password", null);

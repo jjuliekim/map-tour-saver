@@ -3,7 +3,6 @@ package com.example.kim_j_project4;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -13,8 +12,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
-
-import java.util.ArrayList;
 
 public class SignupActivity extends AppCompatActivity {
 
@@ -52,7 +49,7 @@ public class SignupActivity extends AppCompatActivity {
         String age = ageText.getText().toString();
 
         SharedPreferences sharedPreferences = getSharedPreferences("UserData", MODE_PRIVATE);
-        Intent nextIntent = new Intent(SignupActivity.this, MainPageActivity.class);
+        Intent nextIntent = new Intent(SignupActivity.this, DashboardActivity.class);
 
         // check if username already exists
         if (sharedPreferences.contains(username)) {
@@ -77,7 +74,6 @@ public class SignupActivity extends AppCompatActivity {
         editor.apply();
         // pass data to next intent/activity
         nextIntent.putExtra("username", username);
-        Log.i("HERE", "registered");
         startActivity(nextIntent);
     }
 }

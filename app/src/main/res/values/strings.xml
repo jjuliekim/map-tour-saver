@@ -10,4 +10,5 @@
     <string name="age">Age</string>
     <string name="height_in">Height (in)</string>
     <string name="register_info">Register Info</string>
+    <string name="title_activity_dashboard">Dashboard</string>
 </resources>
