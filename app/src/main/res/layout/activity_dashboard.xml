@@ -5,12 +5,31 @@
     android:layout_height="match_parent"
     tools:context=".DashboardActivity">
 
+    <TextView
+        android:id="@+id/welcome_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/welcome"
+        android:textSize="18sp"
+        android:layout_margin="16dp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true" />
+
+    <fragment
+        android:id="@+id/map"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_width="match_parent"
+        android:layout_height="320dp"
+        android:layout_below="@id/welcome_text"
+        android:layout_margin="10dp" />
+
     <EditText
         android:id="@+id/tour_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="@string/tour_name"
-        android:layout_margin="16dp" />
+        android:layout_below="@id/map"
+        android:layout_margin="5dp" />
 
     <EditText
         android:id="@+id/tour_description"
@@ -18,22 +37,44 @@
         android:layout_height="wrap_content"
         android:hint="@string/tour_description"
         android:layout_below="@id/tour_name"
-        android:layout_margin="16dp" />
+        android:layout_margin="5dp" />
+
+    <EditText
+        android:id="@+id/tour_link"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/web_link_optional"
+        android:layout_below="@id/tour_description"
+        android:layout_margin="5dp" />
+
+    <Button
+        android:id="@+id/add_media_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/add_video_or_audio"
+        android:layout_below="@id/tour_link"
+        android:layout_margin="5dp"
+        android:layout_alignParentStart="true" />
 
     <Button
         android:id="@+id/save_tour_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/save_tour"
-        android:layout_below="@id/tour_description"
-        android:layout_margin="16dp"
-        android:layout_alignParentEnd="true" />
+        android:layout_below="@id/add_media_button"
+        android:layout_margin="5dp"
+        android:layout_alignParentStart="true" />
 
-    <fragment
-        android:id="@+id/map"
-        android:name="com.google.android.gms.maps.SupportMapFragment"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/save_tour_button" />
-
+    <Button
+        android:id="@+id/view_tours_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/add_media_button"
+        android:layout_margin="5dp"
+        android:layout_marginStart="-107dp"
+        android:layout_marginTop="66dp"
+        android:layout_marginEnd="5dp"
+        android:layout_marginBottom="5dp"
+        android:layout_toEndOf="@id/save_tour_button"
+        android:text="@string/view_my_tours" />
 </RelativeLayout>

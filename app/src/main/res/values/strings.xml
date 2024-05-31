@@ -14,4 +14,8 @@
     <string name="tour_name">Tour Name</string>
     <string name="tour_description">Tour Description</string>
     <string name="save_tour">Save Tour</string>
+    <string name="welcome">Welcome</string>
+    <string name="web_link_optional">Web Link (Optional)</string>
+    <string name="add_video_or_audio">Add Video or Audio</string>
+    <string name="view_my_tours">View My Tours</string>
 </resources>
