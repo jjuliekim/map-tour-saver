@@ -73,6 +73,7 @@ public class DashboardActivity extends AppCompatActivity implements OnMapReadyCa
 
         dashboardViewModel = new ViewModelProvider(this).get(DashboardViewModel.class);
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        mediaPath = "";
         loadTours();
 
         // add media button
@@ -150,6 +151,10 @@ public class DashboardActivity extends AppCompatActivity implements OnMapReadyCa
             return;
         }
 
+        if (webLink == null) {
+            webLink = "";
+        }
+
         // save tour to json file
         Tour tour = new Tour(tourName, tourDescription, webLink, mediaPath, locations);
         tourList.add(tour);
@@ -216,6 +221,7 @@ public class DashboardActivity extends AppCompatActivity implements OnMapReadyCa
 
                 Tour tour = new Tour(tourName, description, webLink, mediaPath, locations);
                 tourList.add(tour);
+                Log.i("HERE DASHBOARD", "loaded " + tourName);
             }
             Toast.makeText(this, "Tours loaded", Toast.LENGTH_SHORT).show();
         } catch (FileNotFoundException e) {
