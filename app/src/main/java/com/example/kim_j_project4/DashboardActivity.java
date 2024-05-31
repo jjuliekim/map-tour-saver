@@ -141,8 +141,10 @@ public class DashboardActivity extends AppCompatActivity implements OnMapReadyCa
         String tourJson = gson.toJson(tour);
         try (FileWriter writer = new FileWriter(getFilesDir() + "/" + username + "/" + tourName + ".json")) {
             writer.write(tourJson);
+            Log.i("HERE DASHBOARD", "getFilesDir() = " + getFilesDir());
             Toast.makeText(this, "Tour saved successfully", Toast.LENGTH_SHORT).show();
         } catch (IOException e) {
+            Log.i("HERE DASHBOARD", "getFilesDir() = " + getFilesDir());
             Toast.makeText(this, "Failed to save tour", Toast.LENGTH_SHORT).show();
         }
     }
