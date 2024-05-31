@@ -11,4 +11,7 @@
     <string name="height_in">Height (in)</string>
     <string name="register_info">Register Info</string>
     <string name="title_activity_dashboard">Dashboard</string>
+    <string name="tour_name">Tour Name</string>
+    <string name="tour_description">Tour Description</string>
+    <string name="save_tour">Save Tour</string>
 </resources>
