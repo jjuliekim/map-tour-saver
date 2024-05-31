@@ -5,7 +5,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.content.Context;
@@ -16,6 +15,7 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -31,10 +31,20 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.example.kim_j_project4.databinding.ActivityDashboardBinding;
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 public class DashboardActivity extends AppCompatActivity implements OnMapReadyCallback {
     private GoogleMap mMap;
@@ -43,6 +53,7 @@ public class DashboardActivity extends AppCompatActivity implements OnMapReadyCa
     private DashboardViewModel dashboardViewModel;
     private LocationManager locationManager;
     private String mediaPath;
+    private ArrayList<Tour> tourList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +73,7 @@ public class DashboardActivity extends AppCompatActivity implements OnMapReadyCa
 
         dashboardViewModel = new ViewModelProvider(this).get(DashboardViewModel.class);
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        loadTours();
 
         // add media button
         Button addMediaButton = findViewById(R.id.add_media_button);
@@ -73,11 +85,10 @@ public class DashboardActivity extends AppCompatActivity implements OnMapReadyCa
 
         // view tours button
         Button viewToursButton = findViewById(R.id.view_tours_button);
-        viewToursButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // view tours
-            }
+        viewToursButton.setOnClickListener(v -> {
+            Intent nextIntent = new Intent(DashboardActivity.this, ViewToursActivity.class);
+            nextIntent.putExtra("username", username);
+            startActivity(nextIntent);
         });
 
         // refreshing/updating map
@@ -137,16 +148,8 @@ public class DashboardActivity extends AppCompatActivity implements OnMapReadyCa
 
         // save tour to json file
         Tour tour = new Tour(tourName, tourDescription, webLink, mediaPath, locations);
-        Gson gson = new Gson();
-        String tourJson = gson.toJson(tour);
-        try (FileWriter writer = new FileWriter(getFilesDir() + "/" + username + "/" + tourName + ".json")) {
-            writer.write(tourJson);
-            Log.i("HERE DASHBOARD", "getFilesDir() = " + getFilesDir());
-            Toast.makeText(this, "Tour saved successfully", Toast.LENGTH_SHORT).show();
-        } catch (IOException e) {
-            Log.i("HERE DASHBOARD", "getFilesDir() = " + getFilesDir());
-            Toast.makeText(this, "Failed to save tour", Toast.LENGTH_SHORT).show();
-        }
+        tourList.add(tour);
+        saveToursToJson();
     }
 
     // pick media
@@ -164,6 +167,96 @@ public class DashboardActivity extends AppCompatActivity implements OnMapReadyCa
             if (selectedMediaUri != null) {
                 mediaPath = selectedMediaUri.toString();
             }
+        }
+    }
+
+    // load previously saved tours
+    private void loadTours() {
+        // check if file exists
+        File file = new File(getFilesDir(), username + ".json");
+        if (!file.exists()) {
+            return;
+        }
+        try {
+            FileInputStream fis = openFileInput(username + ".json");
+            Scanner scanner = new Scanner(fis);
+            StringBuilder stringBuilder = new StringBuilder();
+            while (scanner.hasNextLine()) {
+                stringBuilder.append(scanner.nextLine());
+            }
+            scanner.close();
+            fis.close();
+
+            String jsonString = stringBuilder.toString();
+            JSONObject userJson = new JSONObject(jsonString);
+            JSONArray tourArray = userJson.getJSONArray("tourList");
+
+            tourList = new ArrayList<>();
+            for (int i = 0; i < tourArray.length(); i++) {
+                JSONObject tourJson = tourArray.getJSONObject(i);
+                String tourName = tourJson.getString("tourName");
+                String description = tourJson.getString("description");
+                String webLink = tourJson.getString("webLink");
+                String mediaPath = tourJson.getString("mediaPath");
+
+                JSONArray locationArray = tourJson.getJSONArray("locations");
+                ArrayList<LatLng> locations = new ArrayList<>();
+                for (int j = 0; j < locationArray.length(); j++) {
+                    JSONObject locationJson = locationArray.getJSONObject(j);
+                    double latitude = locationJson.getDouble("latitude");
+                    double longitude = locationJson.getDouble("longitude");
+                    locations.add(new LatLng(latitude, longitude));
+                }
+
+                Tour tour = new Tour(tourName, description, webLink, mediaPath, locations);
+                tourList.add(tour);
+            }
+            Toast.makeText(this, "Tours loaded", Toast.LENGTH_SHORT).show();
+        } catch (FileNotFoundException e) {
+            tourList = new ArrayList<>();
+        } catch (Exception e) {
+            Toast.makeText(this, "Failed to load tours", Toast.LENGTH_SHORT).show();
+            Log.i("HERE DASHBOARD", "Failed to load tours", e);
+        }
+    }
+
+    // save tours to json file
+    private void saveToursToJson() {
+        try {
+            JSONArray tourArray = new JSONArray();
+            // Tour -> Location
+            for (Tour tour : tourList) {
+                JSONObject tourJson = new JSONObject();
+                tourJson.put("tourName", tour.getName());
+                tourJson.put("description", tour.getDescription());
+                tourJson.put("webLink", tour.getWebLink());
+                tourJson.put("mediaPath", tour.getMediaPath());
+                // Location -> LatLng
+                JSONArray locationArray = new JSONArray();
+                for (LatLng location : tour.getLocations()) {
+                    JSONObject locationJson = new JSONObject();
+                    locationJson.put("latitude", location.latitude);
+                    locationJson.put("longitude", location.longitude);
+                    locationArray.put(locationJson);
+                }
+                tourJson.put("locations", locationArray);
+                tourArray.put(tourJson);
+            }
+            // Json File: Username -> TourList
+            JSONObject userJson = new JSONObject();
+            userJson.put("username", username);
+            userJson.put("tourList", tourArray);
+
+            // save to file
+            String json = userJson.toString();
+            FileOutputStream fos = openFileOutput(username + ".json", Context.MODE_PRIVATE);
+            fos.write(json.getBytes());
+            fos.close();
+            Toast.makeText(this, "Tour Saved", Toast.LENGTH_SHORT).show();
+            Log.i("HERE DASHBOARD", "tour saved");
+        } catch (Exception e) {
+            Toast.makeText(this, "Failed to save tour", Toast.LENGTH_SHORT).show();
+            Log.e("DashboardActivity", "Failed to save tour", e);
         }
     }
 }
