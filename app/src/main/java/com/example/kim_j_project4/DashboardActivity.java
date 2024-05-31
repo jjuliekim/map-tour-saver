@@ -183,6 +183,7 @@ public class DashboardActivity extends AppCompatActivity implements OnMapReadyCa
     private void loadTours() {
         // check if file exists
         File file = new File(getFilesDir(), username + ".json");
+        Log.i("HERE DASHBOARD", file.getAbsolutePath());
         if (!file.exists()) {
             tourList = new ArrayList<>();
             Log.i("HERE DASHBOARD", "no json file yet");
