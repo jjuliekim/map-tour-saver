@@ -19,7 +19,6 @@ public class DashboardViewModel extends ViewModel {
     public DashboardViewModel() {
         locations = new MutableLiveData<>();
         locations.setValue(new ArrayList<>());
-        Log.i("HERE DASHBOARD VM", "ViewModel is created");
     }
 
     public LiveData<ArrayList<LatLng>> getLocations() {
