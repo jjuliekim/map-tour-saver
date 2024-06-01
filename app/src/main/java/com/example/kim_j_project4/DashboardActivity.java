@@ -87,9 +87,11 @@ public class DashboardActivity extends AppCompatActivity implements OnMapReadyCa
         // view tours button
         Button viewToursButton = findViewById(R.id.view_tours_button);
         viewToursButton.setOnClickListener(v -> {
-            Intent nextIntent = new Intent(DashboardActivity.this, ViewToursActivity.class);
-            nextIntent.putExtra("username", username);
-            startActivity(nextIntent);
+            if (!tourList.isEmpty()) { // only view tours if there are tours to view
+                Intent nextIntent = new Intent(DashboardActivity.this, ViewToursActivity.class);
+                nextIntent.putExtra("username", username);
+                startActivity(nextIntent);
+            }
         });
 
         // refreshing/updating map
