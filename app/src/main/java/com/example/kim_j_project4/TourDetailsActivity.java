@@ -1,4 +1,3 @@
-/*
 package com.example.kim_j_project4;
 
 import android.content.Intent;
@@ -28,12 +27,7 @@ public class TourDetailsActivity extends AppCompatActivity {
     private Tour tour;
     private EditText editTourName;
     private EditText editTourDesc;
-    private WebView webView;
     private VideoView videoView;
-    private Button saveButton;
-    private Button shareButton;
-    private Button playAudioButton;
-    private Button playVideoButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,12 +42,12 @@ public class TourDetailsActivity extends AppCompatActivity {
         // xml contents
         editTourName = findViewById(R.id.edit_tour_name);
         editTourDesc = findViewById(R.id.edit_tour_description);
-        webView = findViewById(R.id.web_view);
+        WebView webView = findViewById(R.id.web_view);
         videoView = findViewById(R.id.videoView);
-        saveButton = findViewById(R.id.save_button);
-        shareButton = findViewById(R.id.share_button);
-        playAudioButton = findViewById(R.id.play_audio_button);
-        playVideoButton = findViewById(R.id.play_video_button);
+        Button saveButton = findViewById(R.id.save_button);
+        Button shareButton = findViewById(R.id.share_button);
+        Button playAudioButton = findViewById(R.id.play_audio_button);
+        Button playVideoButton = findViewById(R.id.play_video_button);
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(googleMap -> {
             for (LatLng location : tour.getLocations()) {
@@ -130,4 +124,4 @@ public class TourDetailsActivity extends AppCompatActivity {
         MediaPlayer mp = MediaPlayer.create(TourDetailsActivity.this, audioUri);
         mp.start();
     }
-}*/
+}
