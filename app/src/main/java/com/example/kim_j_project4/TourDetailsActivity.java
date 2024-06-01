@@ -17,10 +17,14 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
+
 public class TourDetailsActivity extends AppCompatActivity {
     private String username;
     private Tour tour;
-    private int position;
     private EditText editTourName;
     private EditText editTourDesc;
     private WebView webView;
@@ -49,11 +53,17 @@ public class TourDetailsActivity extends AppCompatActivity {
         shareButton = findViewById(R.id.share_button);
         playAudioButton = findViewById(R.id.play_audio_button);
         playVideoButton = findViewById(R.id.play_video_button);
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+        mapFragment.getMapAsync(googleMap -> {
+            for (LatLng location : tour.getLocations()) {
+                googleMap.addMarker(new MarkerOptions().position(location));
+            }
+            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(tour.getLocations().get(0), 10));
+        });
 
         Intent myIntent = getIntent();
         username = myIntent.getStringExtra("username");
         tour = (Tour) myIntent.getSerializableExtra("tour");
-        position = myIntent.getIntExtra("position", -1);
 
         // display tour details
         editTourName.setText(tour.getName());
@@ -97,7 +107,14 @@ public class TourDetailsActivity extends AppCompatActivity {
 
     // share tour's name and description via email or text using implicit intent
     private void shareTour() {
+        String tourName = tour.getName();
+        String tourDescription = tour.getDescription();
 
+        Intent shareIntent = new Intent(Intent.ACTION_SEND);
+        shareIntent.setType("text/plain");
+        shareIntent.putExtra(Intent.EXTRA_SUBJECT, tourName);
+        shareIntent.putExtra(Intent.EXTRA_TEXT, tourDescription);
+        startActivity(Intent.createChooser(shareIntent, "Share Tour"));
     }
 
     // play video
