@@ -89,9 +89,13 @@ public class DashboardActivity extends AppCompatActivity implements OnMapReadyCa
         Button viewToursButton = findViewById(R.id.view_tours_button);
         viewToursButton.setOnClickListener(v -> {
             if (!tourList.isEmpty()) { // only view tours if there are tours to view
+                Log.i("HERE DASHBOARD", "next intent");
                 Intent nextIntent = new Intent(DashboardActivity.this, ViewToursActivity.class);
                 nextIntent.putExtra("username", username);
                 startActivity(nextIntent);
+            } else {
+                Log.i("HERE DASHBOARD", "tour list is empty");
+                Toast.makeText(this, "No Tours Saved", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -234,7 +238,6 @@ public class DashboardActivity extends AppCompatActivity implements OnMapReadyCa
                 tourList.add(tour);
                 Log.i("HERE DASHBOARD", "loaded " + tourName);
             }
-            Toast.makeText(this, "Tours loaded", Toast.LENGTH_SHORT).show();
         } catch (FileNotFoundException e) {
             tourList = new ArrayList<>();
         } catch (Exception e) {

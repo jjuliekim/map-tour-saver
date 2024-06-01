@@ -44,14 +44,15 @@ public class ViewToursActivity extends AppCompatActivity {
             return insets;
         });
 
+        Intent myIntent = getIntent();
+        username = myIntent.getStringExtra("username");
+        loadTours();
+
         tourAdapter = new TourAdapter(tourList);
         recyclerView = findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(tourAdapter);
-
-        Intent myIntent = getIntent();
-        username = myIntent.getStringExtra("username");
-        loadTours();
+        Log.i("HERE VIEW TOURS", "loaded recycler view");
 
         launcher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
             if (result.getResultCode() == Activity.RESULT_OK) {
