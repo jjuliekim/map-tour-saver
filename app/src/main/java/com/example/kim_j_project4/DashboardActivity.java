@@ -57,6 +57,7 @@ public class DashboardActivity extends AppCompatActivity implements OnMapReadyCa
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Toast.makeText(this, "Loading", Toast.LENGTH_SHORT).show();
         super.onCreate(savedInstanceState);
         binding = ActivityDashboardBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
@@ -107,6 +108,7 @@ public class DashboardActivity extends AppCompatActivity implements OnMapReadyCa
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
+        Log.i("HERE DASHBOARD", "map ready");
         mMap = googleMap;
         // check permissions
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
@@ -161,6 +163,12 @@ public class DashboardActivity extends AppCompatActivity implements OnMapReadyCa
         Tour tour = new Tour(tourName, tourDescription, webLink, mediaPath, locations);
         tourList.add(tour);
         saveToursToJson();
+
+        // clear page
+        nameEditText.setText("");
+        descriptionEditText.setText("");
+        webLinkEditText.setText("");
+        mMap.clear();
     }
 
     // pick media

@@ -32,14 +32,14 @@ public class TourAdapter extends RecyclerView.Adapter<TourAdapter.TourViewHolder
         holder.tourNameText.setText(tour.getName());
         holder.tourDescText.setText(tour.getDescription());
         // Handle item click
-        holder.itemView.setOnClickListener(v -> {
+        /*holder.itemView.setOnClickListener(v -> {
             Intent intent = new Intent(v.getContext(), TourDetailsActivity.class);
             intent.putExtra("tour", tour);
             String username = ((ViewToursActivity) v.getContext()).getUsername();
             intent.putExtra("username", username);
             ActivityResultLauncher<Intent> launcher = ((ViewToursActivity) v.getContext()).getLauncher();
             launcher.launch(intent);
-        });
+        });*/
     }
 
     @Override

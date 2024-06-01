@@ -1,3 +1,4 @@
+/*
 package com.example.kim_j_project4;
 
 import android.content.Intent;
@@ -129,4 +130,4 @@ public class TourDetailsActivity extends AppCompatActivity {
         MediaPlayer mp = MediaPlayer.create(TourDetailsActivity.this, audioUri);
         mp.start();
     }
-}
+}*/
