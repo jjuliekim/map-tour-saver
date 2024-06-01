@@ -10,21 +10,23 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.maps.model.LatLng;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
 public class ViewToursActivity extends AppCompatActivity {
     private String username;
     private ArrayList<Tour> tourList;
+    private RecyclerView recyclerView;
+    private TourAdapter tourAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,9 +38,14 @@ public class ViewToursActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
+        tourAdapter = new TourAdapter(tourList);
+        recyclerView = findViewById(R.id.recycler_view);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setAdapter(tourAdapter);
+
         Intent myIntent = getIntent();
         username = myIntent.getStringExtra("username");
-
         loadTours();
     }
 
@@ -77,12 +84,12 @@ public class ViewToursActivity extends AppCompatActivity {
 
                 Tour tour = new Tour(tourName, description, webLink, mediaPath, locations);
                 tourList.add(tour);
-                Log.i("HERE DASHBOARD", "loaded " + tourName);
+                Log.i("HERE VIEW TOURS", "loaded " + tourName);
             }
             Toast.makeText(this, "Tours loaded", Toast.LENGTH_SHORT).show();
         } catch (Exception e) {
             Toast.makeText(this, "Failed to load tours", Toast.LENGTH_SHORT).show();
-            Log.i("HERE DASHBOARD", "Failed to load tours", e);
+            Log.i("HERE VIEW TOURS", "Failed to load tours", e);
         }
     }
 
