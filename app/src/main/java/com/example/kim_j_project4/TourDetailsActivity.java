@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.webkit.WebView;
 import android.widget.Button;
@@ -31,6 +32,7 @@ public class TourDetailsActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.i("HERE TOUR DETAILS", "creating");
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_tour_details);
@@ -48,6 +50,7 @@ public class TourDetailsActivity extends AppCompatActivity {
         Button shareButton = findViewById(R.id.share_button);
         Button playAudioButton = findViewById(R.id.play_audio_button);
         Button playVideoButton = findViewById(R.id.play_video_button);
+        Log.i("HERE TOUR DETAILS", "creating map");
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(googleMap -> {
             for (LatLng location : tour.getLocations()) {
@@ -55,6 +58,7 @@ public class TourDetailsActivity extends AppCompatActivity {
             }
             googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(tour.getLocations().get(0), 10));
         });
+        Log.i("HERE TOUR DETAILS", "map created");
 
         Intent myIntent = getIntent();
         username = myIntent.getStringExtra("username");

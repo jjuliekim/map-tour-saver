@@ -26,12 +26,11 @@ import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-public class ViewToursActivity extends AppCompatActivity {
+public class ViewToursActivity extends AppCompatActivity implements TourAdapter.OnItemClickListener {
     private String username;
     private ArrayList<Tour> tourList;
     private RecyclerView recyclerView;
     private TourAdapter tourAdapter;
-    private ActivityResultLauncher<Intent> launcher;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,24 +47,10 @@ public class ViewToursActivity extends AppCompatActivity {
         username = myIntent.getStringExtra("username");
         loadTours();
 
-        tourAdapter = new TourAdapter(tourList);
+        tourAdapter = new TourAdapter(tourList, this);
         recyclerView = findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(tourAdapter);
-        Log.i("HERE VIEW TOURS", "loaded recycler view");
-
-        launcher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
-            if (result.getResultCode() == Activity.RESULT_OK) {
-                Intent data = result.getData();
-                if (data != null) {
-                    Tour updatedTour = (Tour) data.getSerializableExtra("updatedTour");
-                    int position = data.getIntExtra("position", -1);
-                    if (position != -1 && updatedTour != null) {
-                        tourAdapter.updateTour(position, updatedTour);
-                    }
-                }
-            }
-        });
     }
 
     // load tours from json file
@@ -105,7 +90,6 @@ public class ViewToursActivity extends AppCompatActivity {
                 tourList.add(tour);
                 Log.i("HERE VIEW TOURS", "loaded " + tourName);
             }
-            Toast.makeText(this, "Tours loaded", Toast.LENGTH_SHORT).show();
         } catch (Exception e) {
             Toast.makeText(this, "Failed to load tours", Toast.LENGTH_SHORT).show();
             Log.i("HERE VIEW TOURS", "Failed to load tours", e);
@@ -113,22 +97,12 @@ public class ViewToursActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == 1 && resultCode == RESULT_OK && data != null) {
-            Tour updatedTour = (Tour) data.getSerializableExtra("updatedTour");
-            int position = data.getIntExtra("position", -1);
-            if (position != -1 && updatedTour != null) {
-                tourAdapter.updateTour(position, updatedTour);
-            }
-        }
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public ActivityResultLauncher<Intent> getLauncher() {
-        return launcher;
+    public void onItemClick(int position) {
+        Tour clickedTour = tourList.get(position);
+        Log.i("HERE VIEW TOURS", "tour #" + position + ": " + clickedTour.getName());
+        Intent nextIntent = new Intent(ViewToursActivity.this, TourDetailsActivity.class);
+        nextIntent.putExtra("username", username);
+        nextIntent.putExtra("tour", clickedTour);
+        startActivity(nextIntent);
     }
 }
