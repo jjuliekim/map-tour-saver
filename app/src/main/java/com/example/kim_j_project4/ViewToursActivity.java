@@ -6,6 +6,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -93,5 +94,18 @@ public class ViewToursActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == 1 && resultCode == RESULT_OK && data != null) {
+            Tour updatedTour = (Tour) data.getSerializableExtra("updatedTour");
+            int position = data.getIntExtra("position", -1);
+
+            if (position != -1 && updatedTour != null) {
+                tourAdapter.updateTour(position, updatedTour);
+            }
+        }
+    }
 
 }

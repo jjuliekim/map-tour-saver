@@ -18,4 +18,9 @@
     <string name="web_link_optional">Web Link (Optional)</string>
     <string name="add_video_or_audio">Add Video or Audio</string>
     <string name="view_my_tours">View My Tours</string>
+    <string name="save_edits">Save Edits</string>
+    <string name="share">Share</string>
+    <string name="share_tour">Share Tour</string>
+    <string name="play_video">Play Video</string>
+    <string name="play_audio">Play Audio</string>
 </resources>

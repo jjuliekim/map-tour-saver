@@ -1,5 +1,6 @@
 package com.example.kim_j_project4;
 
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,8 +23,7 @@ public class TourAdapter extends RecyclerView.Adapter<TourAdapter.TourViewHolder
     @NonNull
     @Override
     public TourViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View itemView = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.tour_item, parent, false);
+        View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.tour_item, parent, false);
         return new TourViewHolder(itemView);
     }
 
@@ -32,6 +32,13 @@ public class TourAdapter extends RecyclerView.Adapter<TourAdapter.TourViewHolder
         Tour tour = tourList.get(position);
         holder.tourNameText.setText(tour.getName());
         holder.tourDescText.setText(tour.getDescription());
+        // Handle item click
+        holder.itemView.setOnClickListener(v -> {
+            Intent intent = new Intent(v.getContext(), TourDetailsActivity.class);
+            intent.putExtra("tour", tour);
+            intent.putExtra("position", position);
+            ((ViewToursActivity) v.getContext()).startActivityForResult(intent, 1);
+        });
     }
 
     @Override
@@ -39,19 +46,9 @@ public class TourAdapter extends RecyclerView.Adapter<TourAdapter.TourViewHolder
         return tourList.size();
     }
 
-    // return tour
-    public Tour getItem(int position) {
-        return tourList.get(position);
-    }
-
-    // edit tour
-    public void editItem(int position, String newName, String newDescription, String newWebLink, String newMediaPath, ArrayList<LatLng> newLocations) {
-        Tour tour = tourList.get(position);
-        tour.setName(newName);
-        tour.setDescription(newDescription);
-        tour.setWebLink(newWebLink);
-        tour.setMediaPath(newMediaPath);
-        tour.setLocations(newLocations);
+    // update tour
+    public void updateTour(int position, Tour updatedTour) {
+        tourList.set(position, updatedTour);
         notifyItemChanged(position);
     }
 
