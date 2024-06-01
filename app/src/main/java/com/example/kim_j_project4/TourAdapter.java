@@ -6,10 +6,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-
-import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
 
@@ -37,7 +36,10 @@ public class TourAdapter extends RecyclerView.Adapter<TourAdapter.TourViewHolder
             Intent intent = new Intent(v.getContext(), TourDetailsActivity.class);
             intent.putExtra("tour", tour);
             intent.putExtra("position", position);
-            ((ViewToursActivity) v.getContext()).startActivityForResult(intent, 1);
+            String username = ((ViewToursActivity) v.getContext()).getUsername();
+            intent.putExtra("username", username);
+            ActivityResultLauncher<Intent> launcher = ((ViewToursActivity) v.getContext()).getLauncher();
+            launcher.launch(intent);
         });
     }
 

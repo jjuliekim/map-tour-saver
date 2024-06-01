@@ -1,11 +1,14 @@
 package com.example.kim_j_project4;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
@@ -28,6 +31,7 @@ public class ViewToursActivity extends AppCompatActivity {
     private ArrayList<Tour> tourList;
     private RecyclerView recyclerView;
     private TourAdapter tourAdapter;
+    private ActivityResultLauncher<Intent> launcher;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +52,19 @@ public class ViewToursActivity extends AppCompatActivity {
         Intent myIntent = getIntent();
         username = myIntent.getStringExtra("username");
         loadTours();
+
+        launcher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+            if (result.getResultCode() == Activity.RESULT_OK) {
+                Intent data = result.getData();
+                if (data != null) {
+                    Tour updatedTour = (Tour) data.getSerializableExtra("updatedTour");
+                    int position = data.getIntExtra("position", -1);
+                    if (position != -1 && updatedTour != null) {
+                        tourAdapter.updateTour(position, updatedTour);
+                    }
+                }
+            }
+        });
     }
 
     // load tours from json file
@@ -97,15 +114,20 @@ public class ViewToursActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
         if (requestCode == 1 && resultCode == RESULT_OK && data != null) {
             Tour updatedTour = (Tour) data.getSerializableExtra("updatedTour");
             int position = data.getIntExtra("position", -1);
-
             if (position != -1 && updatedTour != null) {
                 tourAdapter.updateTour(position, updatedTour);
             }
         }
     }
 
+    public String getUsername() {
+        return username;
+    }
+
+    public ActivityResultLauncher<Intent> getLauncher() {
+        return launcher;
+    }
 }
