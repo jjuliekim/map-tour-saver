@@ -7,15 +7,19 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.lifecycle.ViewModelProvider;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.media.MediaRecorder;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -36,6 +40,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -46,12 +51,15 @@ public class DashboardActivity extends AppCompatActivity implements OnMapReadyCa
     private LocationManager locationManager;
     private String mediaPath;
     private ArrayList<Tour> tourList;
+    private MediaRecorder recorder;
+    private Button addAudioButton;
+    private Button addVideoButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Toast.makeText(this, "Loading", Toast.LENGTH_SHORT).show();
         super.onCreate(savedInstanceState);
-        com.example.kim_j_project4.databinding.ActivityDashboardBinding binding = ActivityDashboardBinding.inflate(getLayoutInflater());
+        ActivityDashboardBinding binding = ActivityDashboardBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -69,9 +77,13 @@ public class DashboardActivity extends AppCompatActivity implements OnMapReadyCa
         mediaPath = "";
         loadTours();
 
-        // add media button
-        Button addMediaButton = findViewById(R.id.add_media_button);
-        addMediaButton.setOnClickListener(v -> pickMedia());
+        // add video button
+        addVideoButton = findViewById(R.id.add_video_button);
+        addVideoButton.setOnClickListener(v -> recordVideo());
+
+        // add audio button
+        addAudioButton = findViewById(R.id.add_audio_button);
+        addAudioButton.setOnClickListener(v -> recordAudio());
 
         // save tour button
         Button saveButton = findViewById(R.id.save_tour_button);
@@ -81,7 +93,6 @@ public class DashboardActivity extends AppCompatActivity implements OnMapReadyCa
         Button viewToursButton = findViewById(R.id.view_tours_button);
         viewToursButton.setOnClickListener(v -> {
             if (!tourList.isEmpty()) { // only view tours if there are tours to view
-                Log.i("HERE DASHBOARD", "next intent");
                 Intent nextIntent = new Intent(DashboardActivity.this, ViewToursActivity.class);
                 nextIntent.putExtra("username", username);
                 startActivity(nextIntent);
@@ -107,9 +118,9 @@ public class DashboardActivity extends AppCompatActivity implements OnMapReadyCa
         Log.i("HERE DASHBOARD", "map ready");
         mMap = googleMap;
         // check permissions
-        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
             return;
         }
         // get user's current location and move camera there
@@ -167,21 +178,92 @@ public class DashboardActivity extends AppCompatActivity implements OnMapReadyCa
         mMap.clear();
     }
 
-    // pick media
-    private void pickMedia() {
-        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-        intent.setType("*/*");
-        startActivityForResult(intent, 2);
+    // record video
+    private void recordVideo() {
+        if (getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)) {
+            addAudioButton.setVisibility(View.INVISIBLE);
+            Intent intent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
+            if (intent.resolveActivity(getPackageManager()) != null) {
+                File videoFile = null;
+                try {
+                    videoFile = createVideoFile();
+                } catch (IOException e) {
+                    Log.e("DashboardActivity", "Error creating video file", e);
+                }
+                if (videoFile != null) {
+                    Uri videoUri = Uri.fromFile(videoFile);
+                    intent.putExtra(MediaStore.EXTRA_OUTPUT, videoUri);
+                    startActivityForResult(intent, 101);
+                }
+            }
+        } else {
+            Log.i("HERE DASHBOARD", "no camera");
+            Toast.makeText(this, "Camera Error", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    // create file to save the video
+    private File createVideoFile() throws IOException {
+        String fileName = "video_" + System.currentTimeMillis();
+        File storageDir = getExternalFilesDir(null);
+        File videoFile = File.createTempFile(fileName, ".mp4", storageDir);
+        mediaPath = videoFile.getAbsolutePath();
+        Log.i("HERE DASHBOARD", "video path: " + mediaPath);
+        return videoFile;
+    }
+
+    // record audio
+    private void recordAudio() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED ||
+                ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 102);
+        } else {
+            addVideoButton.setVisibility(View.INVISIBLE);
+            startAudioRecording();
+        }
+    }
+
+    private void startAudioRecording() {
+        String audioPath = getExternalCacheDir().getAbsolutePath() + username + "_audio.mp3";
+        Log.i("HERE DASHBOARD", "audio path: " + audioPath);
+        mediaPath = audioPath;
+        recorder = new MediaRecorder();
+        recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+        recorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+        recorder.setOutputFile(audioPath);
+        recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+        try {
+            recorder.prepare();
+        } catch (Exception e) {
+            Log.e("HERE DASHBOARD", "prepare() failed");
+        }
+        recorder.start();
+        Toast.makeText(this, "Recording Audio...", Toast.LENGTH_LONG).show();
+    }
+
+    private void stopAudioRecording() {
+        recorder.stop();
+        recorder.release();
+        recorder = null;
+        Toast.makeText(this, "Audio Recorded", Toast.LENGTH_SHORT).show();
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == 2 && resultCode == RESULT_OK && data != null) {
+        if (requestCode == 101 && resultCode == RESULT_OK && data != null) {
             Uri selectedMediaUri = data.getData();
             if (selectedMediaUri != null) {
                 mediaPath = selectedMediaUri.toString();
             }
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (recorder != null) {
+            stopAudioRecording();
         }
     }
 
@@ -276,4 +358,17 @@ public class DashboardActivity extends AppCompatActivity implements OnMapReadyCa
             Log.e("DashboardActivity", "Failed to save tour", e);
         }
     }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == 102) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                startAudioRecording();
+            } else {
+                Toast.makeText(this, "Audio permission denied", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
 }
