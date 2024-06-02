@@ -183,19 +183,16 @@ public class DashboardActivity extends AppCompatActivity implements OnMapReadyCa
         if (getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)) {
             addAudioButton.setVisibility(View.INVISIBLE);
             Intent intent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
-            if (intent.resolveActivity(getPackageManager()) != null) {
-                File videoFile = null;
-                try {
-                    videoFile = createVideoFile();
-                } catch (IOException e) {
-                    Log.e("DashboardActivity", "Error creating video file", e);
-                }
-                if (videoFile != null) {
-                    Uri videoUri = Uri.fromFile(videoFile);
-                    intent.putExtra(MediaStore.EXTRA_OUTPUT, videoUri);
-                    startActivityForResult(intent, 101);
-                }
+            try { // output file path
+                File videoFile = createVideoFile();
+                Uri videoUri = Uri.fromFile(videoFile);
+                intent.putExtra(MediaStore.EXTRA_OUTPUT, videoUri);
+            } catch (IOException e) {
+                Log.e("HERE DASHBOARD", "Error creating video file", e);
+                Toast.makeText(this, "Error creating video file", Toast.LENGTH_SHORT).show();
+                return;
             }
+            startActivityForResult(intent, 101);
         } else {
             Log.i("HERE DASHBOARD", "no camera");
             Toast.makeText(this, "Camera Error", Toast.LENGTH_SHORT).show();
@@ -204,9 +201,9 @@ public class DashboardActivity extends AppCompatActivity implements OnMapReadyCa
 
     // create file to save the video
     private File createVideoFile() throws IOException {
-        String fileName = "video_" + System.currentTimeMillis();
+        String fileName = "video_" + System.currentTimeMillis() + ".mp4";
         File storageDir = getExternalFilesDir(null);
-        File videoFile = File.createTempFile(fileName, ".mp4", storageDir);
+        File videoFile = File.createTempFile(fileName, null, storageDir);
         mediaPath = videoFile.getAbsolutePath();
         Log.i("HERE DASHBOARD", "video path: " + mediaPath);
         return videoFile;
@@ -252,10 +249,11 @@ public class DashboardActivity extends AppCompatActivity implements OnMapReadyCa
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 101 && resultCode == RESULT_OK && data != null) {
-            Uri selectedMediaUri = data.getData();
-            if (selectedMediaUri != null) {
-                mediaPath = selectedMediaUri.toString();
-            }
+            Log.i("HERE DASHBOARD", "video saved: " + mediaPath);
+            Toast.makeText(this, "Video Saved", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(this, "Video failed", Toast.LENGTH_SHORT).show();
+            Log.i("HERE DASHBOARD", "video failed");
         }
     }
 
