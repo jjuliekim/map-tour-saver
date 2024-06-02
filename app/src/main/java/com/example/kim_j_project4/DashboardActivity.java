@@ -15,9 +15,7 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.util.Log;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -30,9 +28,6 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.example.kim_j_project4.databinding.ActivityDashboardBinding;
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -41,14 +36,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
 public class DashboardActivity extends AppCompatActivity implements OnMapReadyCallback {
     private GoogleMap mMap;
-    private ActivityDashboardBinding binding;
     private String username;
     private DashboardViewModel dashboardViewModel;
     private LocationManager locationManager;
@@ -59,7 +51,7 @@ public class DashboardActivity extends AppCompatActivity implements OnMapReadyCa
     protected void onCreate(Bundle savedInstanceState) {
         Toast.makeText(this, "Loading", Toast.LENGTH_SHORT).show();
         super.onCreate(savedInstanceState);
-        binding = ActivityDashboardBinding.inflate(getLayoutInflater());
+        com.example.kim_j_project4.databinding.ActivityDashboardBinding binding = ActivityDashboardBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -159,7 +151,7 @@ public class DashboardActivity extends AppCompatActivity implements OnMapReadyCa
             return;
         }
 
-        if (webLink == null) {
+        if (webLink.isEmpty()) {
             webLink = "";
         }
 
@@ -236,7 +228,6 @@ public class DashboardActivity extends AppCompatActivity implements OnMapReadyCa
 
                 Tour tour = new Tour(tourName, description, webLink, mediaPath, locations);
                 tourList.add(tour);
-                Log.i("HERE DASHBOARD", "loaded " + tourName);
             }
         } catch (FileNotFoundException e) {
             tourList = new ArrayList<>();

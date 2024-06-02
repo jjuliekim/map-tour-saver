@@ -1,11 +1,13 @@
 package com.example.kim_j_project4;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.google.android.gms.maps.model.LatLng;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Tour implements Serializable {
+public class Tour implements Parcelable {
     private String name;
     private String description;
     private String webLink;
@@ -19,6 +21,41 @@ public class Tour implements Serializable {
         this.webLink = webLink;
         this.mediaPath = mediaPath;
         this.locations = locations;
+    }
+
+    // parcelable implementation
+    protected Tour(Parcel in) {
+        name = in.readString();
+        description = in.readString();
+        webLink = in.readString();
+        mediaPath = in.readString();
+        locations = in.createTypedArrayList(LatLng.CREATOR);
+    }
+
+    public static final Creator<Tour> CREATOR = new Creator<Tour>() {
+        @Override
+        public Tour createFromParcel(Parcel in) {
+            return new Tour(in);
+        }
+
+        @Override
+        public Tour[] newArray(int size) {
+            return new Tour[size];
+        }
+    };
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(name);
+        dest.writeString(description);
+        dest.writeString(webLink);
+        dest.writeString(mediaPath);
+        dest.writeTypedList(locations);
     }
 
     // getters and setters

@@ -1,15 +1,11 @@
 package com.example.kim_j_project4;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -29,8 +25,6 @@ import java.util.Scanner;
 public class ViewToursActivity extends AppCompatActivity implements TourAdapter.OnItemClickListener {
     private String username;
     private ArrayList<Tour> tourList;
-    private RecyclerView recyclerView;
-    private TourAdapter tourAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,8 +41,8 @@ public class ViewToursActivity extends AppCompatActivity implements TourAdapter.
         username = myIntent.getStringExtra("username");
         loadTours();
 
-        tourAdapter = new TourAdapter(tourList, this);
-        recyclerView = findViewById(R.id.recycler_view);
+        TourAdapter tourAdapter = new TourAdapter(tourList, this);
+        RecyclerView recyclerView = findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(tourAdapter);
     }
@@ -88,8 +82,8 @@ public class ViewToursActivity extends AppCompatActivity implements TourAdapter.
 
                 Tour tour = new Tour(tourName, description, webLink, mediaPath, locations);
                 tourList.add(tour);
-                Log.i("HERE VIEW TOURS", "loaded " + tourName);
             }
+            Log.i("HERE VIEW TOURS", "loaded tours");
         } catch (Exception e) {
             Toast.makeText(this, "Failed to load tours", Toast.LENGTH_SHORT).show();
             Log.i("HERE VIEW TOURS", "Failed to load tours", e);

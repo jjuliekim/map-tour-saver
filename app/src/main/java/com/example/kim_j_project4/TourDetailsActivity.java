@@ -58,11 +58,10 @@ public class TourDetailsActivity extends AppCompatActivity {
             }
             googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(tour.getLocations().get(0), 10));
         });
-        Log.i("HERE TOUR DETAILS", "map created");
 
         Intent myIntent = getIntent();
         username = myIntent.getStringExtra("username");
-        tour = (Tour) myIntent.getSerializableExtra("tour");
+        tour = myIntent.getParcelableExtra("tour");
 
         // display tour details
         editTourName.setText(tour.getName());
