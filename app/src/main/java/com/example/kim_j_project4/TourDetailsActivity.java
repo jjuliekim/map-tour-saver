@@ -29,7 +29,6 @@ import org.json.JSONObject;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -129,8 +128,7 @@ public class TourDetailsActivity extends AppCompatActivity {
 
         Intent shareIntent = new Intent(Intent.ACTION_SEND);
         shareIntent.setType("text/plain");
-        shareIntent.putExtra(Intent.EXTRA_SUBJECT, tourName);
-        shareIntent.putExtra(Intent.EXTRA_TEXT, tourDescription);
+        shareIntent.putExtra(Intent.EXTRA_TEXT, "Tour: " + tourName + "!\n" + tourDescription);
         startActivity(Intent.createChooser(shareIntent, "Share Tour"));
     }
 
