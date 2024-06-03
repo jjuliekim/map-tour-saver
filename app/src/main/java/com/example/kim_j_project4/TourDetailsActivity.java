@@ -43,6 +43,7 @@ public class TourDetailsActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Log.i("HERE TOUR DETAILS", "creating");
+        Toast.makeText(this, "Loading", Toast.LENGTH_SHORT).show();
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_tour_details);
@@ -137,13 +138,13 @@ public class TourDetailsActivity extends AppCompatActivity {
 
     // play video
     private void playVideo() {
-        if (!tour.getMediaPath().startsWith("video")) {
-            Log.i("HERE TOUR DETAILS", "not video");
-            return;
+        try {
+            Uri videoUri = Uri.parse(tour.getMediaPath());
+            videoView.setVideoURI(videoUri);
+            videoView.start();
+        } catch (Exception e) {
+            Log.i("HERE TOUR DETAILS", "video e: " + e.getMessage());
         }
-        Uri videoUri = Uri.parse(tour.getMediaPath());
-        videoView.setVideoURI(videoUri);
-        videoView.start();
     }
 
     // play audio
