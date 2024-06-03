@@ -290,8 +290,8 @@ public class DashboardActivity extends AppCompatActivity implements OnMapReadyCa
             Uri videoUri = data.getData();
             if (videoUri != null) {
                 try {
-                    String path = getRealPathFromURI(videoUri);
-                    Log.i("HERE DASHBOARD", "video path: " + path);
+                    mediaPath = getRealPathFromURI(videoUri);
+                    Log.i("HERE DASHBOARD", "video path: " + mediaPath);
                     Toast.makeText(this, "Video Saved", Toast.LENGTH_SHORT).show();
                 } catch (Exception e){
                     Log.i("HERE DASHBOARD", "on activity e: " + e.getMessage());
