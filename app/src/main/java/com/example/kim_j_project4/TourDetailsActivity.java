@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.EditText;
@@ -76,6 +77,8 @@ public class TourDetailsActivity extends AppCompatActivity {
         editTourName.setText(tour.getName());
         editTourDesc.setText(tour.getDescription());
         if (!tour.getWebLink().isEmpty()) {
+            WebSettings settings = webView.getSettings();
+            settings.setJavaScriptEnabled(true);
             webView.loadUrl(tour.getWebLink());
         }
         if (!tour.getMediaPath().isEmpty()) {
