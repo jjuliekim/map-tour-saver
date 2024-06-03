@@ -134,12 +134,21 @@ public class TourDetailsActivity extends AppCompatActivity {
 
     // play video
     private void playVideo() {
-        videoView.setVideoPath(tour.getMediaPath());
+        if (!tour.getMediaPath().startsWith("video")) {
+            Log.i("HERE TOUR DETAILS", "not video");
+            return;
+        }
+        Uri videoUri = Uri.parse(tour.getMediaPath());
+        videoView.setVideoURI(videoUri);
         videoView.start();
     }
 
     // play audio
     private void playAudio() {
+        if (!tour.getMediaPath().startsWith("audio")) {
+            Log.i("HERE TOUR DETAILS", "not audio");
+            return;
+        }
         Uri audioUri = Uri.parse(tour.getMediaPath());
         MediaPlayer mp = MediaPlayer.create(TourDetailsActivity.this, audioUri);
         mp.start();

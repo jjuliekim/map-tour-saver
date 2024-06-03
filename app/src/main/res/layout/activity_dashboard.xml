@@ -65,7 +65,7 @@
                 android:id="@+id/add_video_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:backgroundTint="#FF8C7AB9"
+                android:backgroundTint="#8C7AB9"
                 android:text="@string/record_video"
                 android:layout_marginEnd="16dp"/>
 

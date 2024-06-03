@@ -11,12 +11,14 @@ import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.media.MediaRecorder;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
@@ -54,6 +56,8 @@ public class DashboardActivity extends AppCompatActivity implements OnMapReadyCa
     private MediaRecorder recorder;
     private Button addAudioButton;
     private Button addVideoButton;
+    private boolean isRecording = false;
+    private Uri videoUri;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -182,28 +186,39 @@ public class DashboardActivity extends AppCompatActivity implements OnMapReadyCa
     private void recordVideo() {
         if (getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)) {
             addAudioButton.setVisibility(View.INVISIBLE);
-            Intent intent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
-            try { // output file path
-                File videoFile = createVideoFile();
-                Uri videoUri = Uri.fromFile(videoFile);
-                intent.putExtra(MediaStore.EXTRA_OUTPUT, videoUri);
-            } catch (IOException e) {
-                Log.e("HERE DASHBOARD", "Error creating video file", e);
-                Toast.makeText(this, "Error creating video file", Toast.LENGTH_SHORT).show();
-                return;
+            if (!isRecording) {
+                startVideoRecording();
             }
-            startActivityForResult(intent, 101);
         } else {
             Log.i("HERE DASHBOARD", "no camera");
             Toast.makeText(this, "Camera Error", Toast.LENGTH_SHORT).show();
         }
     }
 
+    // open camera to record video
+    private void startVideoRecording() {
+        isRecording = true;
+        Intent videoIntent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
+        try { // output file path
+            File videoFile = createVideoFile();
+            Uri videoUri = Uri.fromFile(videoFile);
+            videoIntent.putExtra(MediaStore.EXTRA_OUTPUT, videoUri);
+            startActivityForResult(videoIntent, 101);
+        } catch (IOException e) {
+            Log.e("HERE DASHBOARD", "Error creating video file", e);
+            Toast.makeText(this, "Error creating video file", Toast.LENGTH_SHORT).show();
+            isRecording = false;
+        }
+    }
+
     // create file to save the video
     private File createVideoFile() throws IOException {
-        String fileName = "video_" + System.currentTimeMillis() + ".mp4";
-        File storageDir = getExternalFilesDir(null);
-        File videoFile = File.createTempFile(fileName, null, storageDir);
+        String fileName = "video_" + username;
+        File storageDir = new File(Environment.getExternalStorageDirectory(), "AppVideos");
+        if (!storageDir.exists()) {
+            storageDir.mkdirs();
+        }
+        File videoFile = new File(storageDir, "video_" + System.currentTimeMillis() + username + ".mp4");
         mediaPath = videoFile.getAbsolutePath();
         Log.i("HERE DASHBOARD", "video path: " + mediaPath);
         return videoFile;
@@ -220,6 +235,7 @@ public class DashboardActivity extends AppCompatActivity implements OnMapReadyCa
         }
     }
 
+    // start audio recording
     private void startAudioRecording() {
         String audioPath = getExternalCacheDir().getAbsolutePath() + username + "_audio.mp3";
         Log.i("HERE DASHBOARD", "audio path: " + audioPath);
