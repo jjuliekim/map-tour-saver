@@ -195,18 +195,6 @@ public class DashboardActivity extends AppCompatActivity implements OnMapReadyCa
         }
     }
 
-    /*// open camera to record video
-    private void startVideoRecording() {
-        try {
-            addAudioButton.setVisibility(View.INVISIBLE);
-            Intent videoIntent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
-            startActivityForResult(videoIntent, 101);
-            Log.i("HERE DASHBOARD", "recording");
-        } catch (Exception e) {
-            Log.i("HERE DASHBOARD", "video failed: ", e);
-        }
-    }*/
-
     // record audio
     private void recordAudio() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED ||
@@ -369,26 +357,5 @@ public class DashboardActivity extends AppCompatActivity implements OnMapReadyCa
             Log.e("DashboardActivity", "Failed to save tour", e);
         }
     }
-
-    /*@Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == 102) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                startAudioRecording();
-            } else {
-                Toast.makeText(this, "Audio permission denied", Toast.LENGTH_SHORT).show();
-            }
-        }
-        if (requestCode == 101) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED
-                    && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
-                startVideoRecording();
-            } else {
-                // Handle permission denied
-                Toast.makeText(this, "video permission denied", Toast.LENGTH_SHORT).show();
-            }
-        }
-    }*/
 
 }
