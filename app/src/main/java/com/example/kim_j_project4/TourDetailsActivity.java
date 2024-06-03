@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.View;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -80,6 +81,7 @@ public class TourDetailsActivity extends AppCompatActivity {
         if (!tour.getWebLink().isEmpty()) {
             WebSettings settings = webView.getSettings();
             settings.setJavaScriptEnabled(true);
+            webView.setWebViewClient(new WebViewClient());
             webView.loadUrl(tour.getWebLink());
         }
         if (!tour.getMediaPath().isEmpty()) {
