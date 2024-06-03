@@ -5,6 +5,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.FileProvider;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.Manifest;
@@ -201,8 +202,10 @@ public class DashboardActivity extends AppCompatActivity implements OnMapReadyCa
         Intent videoIntent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
         try { // output file path
             File videoFile = createVideoFile();
-            Uri videoUri = Uri.fromFile(videoFile);
+            videoUri = FileProvider.getUriForFile(this, getPackageName() + ".fileprovider", videoFile);
+            Log.e("HERE DASHBOARD", "video uri: " + videoUri.toString());
             videoIntent.putExtra(MediaStore.EXTRA_OUTPUT, videoUri);
+            videoIntent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
             startActivityForResult(videoIntent, 101);
         } catch (IOException e) {
             Log.e("HERE DASHBOARD", "Error creating video file", e);
@@ -213,12 +216,13 @@ public class DashboardActivity extends AppCompatActivity implements OnMapReadyCa
 
     // create file to save the video
     private File createVideoFile() throws IOException {
-        String fileName = "video_" + username;
         File storageDir = new File(Environment.getExternalStorageDirectory(), "AppVideos");
         if (!storageDir.exists()) {
             storageDir.mkdirs();
+            Log.i("HERE DASHBOARD", "dir made:" + storageDir);
         }
-        File videoFile = new File(storageDir, "video_" + System.currentTimeMillis() + username + ".mp4");
+        Log.i("HERE DASHBOARD", "dir:" + storageDir);
+        File videoFile = File.createTempFile("video_" + System.currentTimeMillis() + username + ".mp4", ".mp4", storageDir);
         mediaPath = videoFile.getAbsolutePath();
         Log.i("HERE DASHBOARD", "video path: " + mediaPath);
         return videoFile;
