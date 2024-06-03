@@ -186,12 +186,62 @@ public class DashboardActivity extends AppCompatActivity implements OnMapReadyCa
 
     // record video
     private void recordVideo() {
+        if (!checkAndRequestPermissions()) {
+            Log.i("HERE DASHBOARD", "no perms");
+            Toast.makeText(this, "No Perms", Toast.LENGTH_SHORT).show();
+            return;
+        }
         if (getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)) {
-            Intent intent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
-            startActivityForResult(intent, 101);
+            try {
+                Intent intent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
+                startActivityForResult(intent, 101);
+                addAudioButton.setVisibility(View.INVISIBLE);
+            } catch (Exception e) {
+                Log.i("HERE DASHBOARD", "record video e: " + e.getMessage());
+            }
+
         } else {
             Log.i("HERE DASHBOARD", "no camera");
             Toast.makeText(this, "No Camera", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private boolean checkAndRequestPermissions() {
+        String[] permissions = {
+                Manifest.permission.CAMERA,
+                Manifest.permission.RECORD_AUDIO
+        };
+        boolean allPermissionsGranted = true;
+        for (String permission : permissions) {
+            if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
+                allPermissionsGranted = false;
+                break;
+            }
+        }
+        if (!allPermissionsGranted) {
+            ActivityCompat.requestPermissions(this, permissions, 103);
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == 103) {
+            boolean allPermissionsGranted = true;
+            for (int result : grantResults) {
+                if (result != PackageManager.PERMISSION_GRANTED) {
+                    allPermissionsGranted = false;
+                    break;
+                }
+            }
+            if (allPermissionsGranted) {
+                recordVideo();
+            } else {
+                Log.i("HERE DASHBOARD", "permissions denied");
+                Toast.makeText(this, "Permissions denied", Toast.LENGTH_SHORT).show();
+            }
         }
     }
 
@@ -235,27 +285,34 @@ public class DashboardActivity extends AppCompatActivity implements OnMapReadyCa
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        // video recorded
         if (requestCode == 101 && resultCode == RESULT_OK && data != null) {
             Uri videoUri = data.getData();
-            mediaPath = getRealPathFromURI(videoUri);
-            Log.i("HERE DASHBOARD", "video saved: " + mediaPath);
-            Toast.makeText(this, "Video Saved", Toast.LENGTH_SHORT).show();
-        } else {
-            Toast.makeText(this, "Video failed", Toast.LENGTH_SHORT).show();
-            Log.i("HERE DASHBOARD", "video failed");
+            if (videoUri != null) {
+                try {
+                    String path = getRealPathFromURI(videoUri);
+                    Log.i("HERE DASHBOARD", "video path: " + path);
+                    Toast.makeText(this, "Video Saved", Toast.LENGTH_SHORT).show();
+                } catch (Exception e){
+                    Log.i("HERE DASHBOARD", "on activity e: " + e.getMessage());
+                }
+            }
         }
     }
 
     // get path from uri
-    private String getRealPathFromURI(Uri contentUri) {
-        String[] projection = {MediaStore.Video.Media.DATA};
-        Cursor cursor = getContentResolver().query(contentUri, projection, null, null, null);
-        if (cursor == null) return null;
-        int column_i = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DATA);
-        cursor.moveToFirst();
-        String path = cursor.getString(column_i);
-        cursor.close();
-        return path;
+    private String getRealPathFromURI(Uri uri) {
+        String result;
+        Cursor cursor = getContentResolver().query(uri, null, null, null, null);
+        if (cursor == null) {
+            result = uri.getPath();
+        } else {
+            cursor.moveToFirst();
+            int i = cursor.getColumnIndex(MediaStore.Video.VideoColumns.DATA);
+            result = cursor.getString(i);
+            cursor.close();
+        }
+        return result;
     }
 
     @Override
