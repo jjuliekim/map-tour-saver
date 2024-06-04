@@ -1,3 +1,2 @@
-# Project 4 - Julie Kim
-## Tour Planner App
+## Project 4 (Tour Planner App) - Julie Kim
 After giving location permissions, must restart app once to see changes. 
