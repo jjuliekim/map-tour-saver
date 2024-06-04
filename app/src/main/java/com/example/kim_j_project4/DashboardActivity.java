@@ -218,32 +218,12 @@ public class DashboardActivity extends AppCompatActivity implements OnMapReadyCa
         }
     }
 
-    /*private boolean checkAndRequestPermissions() {
-        String[] permissions = {
-                Manifest.permission.CAMERA,
-                Manifest.permission.RECORD_AUDIO,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                Manifest.permission.READ_EXTERNAL_STORAGE
-        };
-        boolean allPermissionsGranted = true;
-        for (String permission : permissions) {
-            if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
-                allPermissionsGranted = false;
-                break;
-            }
-        }
-        if (!allPermissionsGranted) {
-            ActivityCompat.requestPermissions(this, permissions, 103);
-            return false;
-        }
-        return true;
-    }*/
     private void checkAndRequestPermissions() {
         String[] permissions = {
                 Manifest.permission.CAMERA,
                 Manifest.permission.RECORD_AUDIO,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                Manifest.permission.READ_EXTERNAL_STORAGE
+                /*Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                Manifest.permission.READ_EXTERNAL_STORAGE*/
         };
         ArrayList<String> listPermissionsNeeded = new ArrayList<>();
         for (String permission : permissions) {
@@ -256,26 +236,6 @@ public class DashboardActivity extends AppCompatActivity implements OnMapReadyCa
         }
     }
 
-
-    /*@Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == 103) {
-            boolean allPermissionsGranted = true;
-            for (int result : grantResults) {
-                if (result != PackageManager.PERMISSION_GRANTED) {
-                    allPermissionsGranted = false;
-                    break;
-                }
-            }
-            if (allPermissionsGranted) {
-                recordVideo();
-            } else {
-                Log.i("HERE DASHBOARD", "permissions denied");
-                Toast.makeText(this, "Permissions denied", Toast.LENGTH_SHORT).show();
-            }
-        }
-    }*/
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
