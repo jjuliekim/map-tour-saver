@@ -33,4 +33,9 @@ public class DashboardViewModel extends ViewModel {
             locations.setValue(currentList);
         }
     }
+
+    // clear locations
+    public void clearLocations() {
+        locations.setValue(new ArrayList<>());
+    }
 }

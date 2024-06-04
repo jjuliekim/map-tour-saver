@@ -79,6 +79,7 @@ public class DashboardActivity extends AppCompatActivity implements OnMapReadyCa
 
         dashboardViewModel = new ViewModelProvider(this).get(DashboardViewModel.class);
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        checkAndRequestPermissions();
         mediaPath = "";
         loadTours();
 
@@ -188,16 +189,20 @@ public class DashboardActivity extends AppCompatActivity implements OnMapReadyCa
         nameEditText.setText("");
         descriptionEditText.setText("");
         webLinkEditText.setText("");
+        mediaPath = "";
+        addAudioButton.setVisibility(View.VISIBLE);
+        addVideoButton.setVisibility(View.VISIBLE);
+        dashboardViewModel.clearLocations();
         mMap.clear();
     }
 
     // record video
     private void recordVideo() {
-        if (!checkAndRequestPermissions()) {
+        /*if (!checkAndRequestPermissions()) {
             Log.i("HERE DASHBOARD", "no perms");
             Toast.makeText(this, "No Perms", Toast.LENGTH_SHORT).show();
             return;
-        }
+        }*/
         if (getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)) {
             try {
                 Intent intent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
@@ -206,17 +211,18 @@ public class DashboardActivity extends AppCompatActivity implements OnMapReadyCa
             } catch (Exception e) {
                 Log.i("HERE DASHBOARD", "record video e: " + e.getMessage());
             }
-
         } else {
             Log.i("HERE DASHBOARD", "no camera");
             Toast.makeText(this, "No Camera", Toast.LENGTH_SHORT).show();
         }
     }
 
-    private boolean checkAndRequestPermissions() {
+    /*private boolean checkAndRequestPermissions() {
         String[] permissions = {
                 Manifest.permission.CAMERA,
-                Manifest.permission.RECORD_AUDIO
+                Manifest.permission.RECORD_AUDIO,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                Manifest.permission.READ_EXTERNAL_STORAGE
         };
         boolean allPermissionsGranted = true;
         for (String permission : permissions) {
@@ -230,9 +236,27 @@ public class DashboardActivity extends AppCompatActivity implements OnMapReadyCa
             return false;
         }
         return true;
+    }*/
+    private void checkAndRequestPermissions() {
+        String[] permissions = {
+                Manifest.permission.CAMERA,
+                Manifest.permission.RECORD_AUDIO,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                Manifest.permission.READ_EXTERNAL_STORAGE
+        };
+        ArrayList<String> listPermissionsNeeded = new ArrayList<>();
+        for (String permission : permissions) {
+            if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
+                listPermissionsNeeded.add(permission);
+            }
+        }
+        if (!listPermissionsNeeded.isEmpty()) {
+            ActivityCompat.requestPermissions(this, listPermissionsNeeded.toArray(new String[0]), 103);
+        }
     }
 
-    @Override
+
+    /*@Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == 103) {
@@ -250,7 +274,26 @@ public class DashboardActivity extends AppCompatActivity implements OnMapReadyCa
                 Toast.makeText(this, "Permissions denied", Toast.LENGTH_SHORT).show();
             }
         }
+    }*/
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == 103) {
+            boolean allPermissionsGranted = true;
+            for (int result : grantResults) {
+                if (result != PackageManager.PERMISSION_GRANTED) {
+                    allPermissionsGranted = false;
+                    break;
+                }
+            }
+            if (allPermissionsGranted) {
+                Toast.makeText(this, "All permissions granted", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, "Permissions denied", Toast.LENGTH_SHORT).show();
+            }
+        }
     }
+
 
     // record audio
     private void recordAudio() {
