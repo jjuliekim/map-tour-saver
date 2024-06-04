@@ -44,7 +44,6 @@ public class TourDetailsActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Log.i("HERE TOUR DETAILS", "creating");
-        Toast.makeText(this, "Loading", Toast.LENGTH_SHORT).show();
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_tour_details);

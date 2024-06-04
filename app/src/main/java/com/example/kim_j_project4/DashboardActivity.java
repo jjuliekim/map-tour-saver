@@ -218,7 +218,20 @@ public class DashboardActivity extends AppCompatActivity implements OnMapReadyCa
             }
         }
         if (requestCode == 103) {
-            enableLocationUpdates();
+            boolean allPermissionsGranted = true;
+            for (int result : grantResults) {
+                if (result != PackageManager.PERMISSION_GRANTED) {
+                    allPermissionsGranted = false;
+                    break;
+                }
+            }
+            if (allPermissionsGranted) {
+                Log.i("HERE DASHBOARD", "all permissions granted");
+                enableLocationUpdates();
+            } else {
+                Log.i("HERE DASHBOARD", "permissions denied");
+//                Toast.makeText(this, "Must Restart To See Changes", Toast.LENGTH_SHORT).show();
+            }
         }
     }
 
