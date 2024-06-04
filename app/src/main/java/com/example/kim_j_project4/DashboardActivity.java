@@ -71,6 +71,7 @@ public class DashboardActivity extends AppCompatActivity implements OnMapReadyCa
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+        checkAndRequestPermissions();
 
         // set greeting text
         Intent myIntent = getIntent();
@@ -129,7 +130,7 @@ public class DashboardActivity extends AppCompatActivity implements OnMapReadyCa
         });
     }
 
-    @Override
+    /*@Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         // check permissions
@@ -138,7 +139,6 @@ public class DashboardActivity extends AppCompatActivity implements OnMapReadyCa
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
             return;
         }
-        checkAndRequestPermissions();
         // get user's current location and move camera there
         mMap.setMyLocationEnabled(true);
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, new LocationListener() {
@@ -159,6 +159,12 @@ public class DashboardActivity extends AppCompatActivity implements OnMapReadyCa
 
         // allow users to mark locations of interest on the map (store that in ViewModel)
         mMap.setOnMapClickListener(location -> dashboardViewModel.addLocation(location));
+    }*/
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        mMap = googleMap;
+        checkAndRequestPermissions();
     }
 
     // save tour information
@@ -217,7 +223,9 @@ public class DashboardActivity extends AppCompatActivity implements OnMapReadyCa
         String[] permissions = {
                 Manifest.permission.CAMERA,
                 Manifest.permission.RECORD_AUDIO,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE
+                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION
         };
         ArrayList<String> listPermissionsNeeded = new ArrayList<>();
         for (String permission : permissions) {
@@ -227,10 +235,12 @@ public class DashboardActivity extends AppCompatActivity implements OnMapReadyCa
         }
         if (!listPermissionsNeeded.isEmpty()) {
             ActivityCompat.requestPermissions(this, listPermissionsNeeded.toArray(new String[0]), 103);
+        } else {
+            enableLocationUpdates();
         }
     }
 
-    @Override
+    /*@Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == 103) {
@@ -248,18 +258,81 @@ public class DashboardActivity extends AppCompatActivity implements OnMapReadyCa
                 Toast.makeText(this, "Permissions denied - Restart", Toast.LENGTH_SHORT).show();
             }
         }
+    }*/
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == 200) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Permission granted, start audio recording
+                startAudioRecording();
+            } else {
+                // Permission denied, show a message or handle accordingly
+                Toast.makeText(this, "Permission Denied for Audio Recording", Toast.LENGTH_SHORT).show();
+            }
+        }
+        if (requestCode == 103) {
+            boolean allPermissionsGranted = true;
+            for (int result : grantResults) {
+                if (result != PackageManager.PERMISSION_GRANTED) {
+                    allPermissionsGranted = false;
+                    break;
+                }
+            }
+            if (allPermissionsGranted) {
+                Log.i("HERE DASHBOARD", "all permissions granted");
+                enableLocationUpdates();
+            } else {
+                Log.i("HERE DASHBOARD", "permissions denied");
+                Toast.makeText(this, "Permissions Denied - Restart", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    private void enableLocationUpdates() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+
+        mMap.setMyLocationEnabled(true);
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, new LocationListener() {
+            @Override
+            public void onLocationChanged(@NonNull Location location) {
+                LatLng currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLocation, 10));
+                locationManager.removeUpdates(this);
+            }
+        });
+
+        // Restore marked locations if any
+        ArrayList<LatLng> savedLocations = dashboardViewModel.getLocations().getValue();
+        if (savedLocations != null) {
+            for (LatLng location : savedLocations) {
+                mMap.addMarker(new MarkerOptions().position(location));
+            }
+        }
+
+        // Allow users to mark locations of interest on the map (store that in ViewModel)
+        mMap.setOnMapClickListener(location -> dashboardViewModel.addLocation(location));
     }
 
 
     // record audio
     private void recordAudio() {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED ||
-                ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 103);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+            requestAudioRecordingPermission();
+            Log.i("HERE DASHBOARD", "need record audio perms");
+            Toast.makeText(this, "Need Permission", Toast.LENGTH_SHORT).show();
         } else {
             addVideoButton.setVisibility(View.INVISIBLE);
             startAudioRecording();
         }
+    }
+
+    // Add this method to request audio recording permission
+    private void requestAudioRecordingPermission() {
+        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, 200);
     }
 
     // start audio recording
