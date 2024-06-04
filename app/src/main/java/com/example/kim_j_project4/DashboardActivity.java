@@ -129,7 +129,6 @@ public class DashboardActivity extends AppCompatActivity implements OnMapReadyCa
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        Log.i("HERE DASHBOARD", "map ready");
         mMap = googleMap;
         // check permissions
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
@@ -143,7 +142,6 @@ public class DashboardActivity extends AppCompatActivity implements OnMapReadyCa
             @Override
             public void onLocationChanged(@NonNull Location location) {
                 LatLng currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
-                Log.i("HERE DASHBOARD", "curr loc: " + location.getLatitude() + ", " + location.getLongitude());
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLocation, 10));
                 locationManager.removeUpdates(this);
             }
