@@ -222,8 +222,7 @@ public class DashboardActivity extends AppCompatActivity implements OnMapReadyCa
         String[] permissions = {
                 Manifest.permission.CAMERA,
                 Manifest.permission.RECORD_AUDIO,
-                /*Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                Manifest.permission.READ_EXTERNAL_STORAGE*/
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
         };
         ArrayList<String> listPermissionsNeeded = new ArrayList<>();
         for (String permission : permissions) {
@@ -280,19 +279,24 @@ public class DashboardActivity extends AppCompatActivity implements OnMapReadyCa
         recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
         try {
             recorder.prepare();
+            recorder.start();
+            Toast.makeText(this, "Recording Audio...", Toast.LENGTH_LONG).show();
         } catch (Exception e) {
-            Log.e("HERE DASHBOARD", "prepare() failed");
+            Log.e("HERE DASHBOARD", "audio recorder failed");
         }
-        recorder.start();
-        Toast.makeText(this, "Recording Audio...", Toast.LENGTH_LONG).show();
     }
 
     private void stopAudioRecording() {
         if (recorder != null) {
-            recorder.stop();
-            recorder.release();
-            recorder = null;
-            Toast.makeText(this, "Audio Recorded", Toast.LENGTH_SHORT).show();
+            try {
+                recorder.stop();
+                recorder.release();
+                Toast.makeText(this, "Audio Recorded", Toast.LENGTH_SHORT).show();
+            } catch (RuntimeException e) {
+                Log.e("HERE DASHBOARD", "stop() failed", e);
+            } finally {
+                recorder = null;
+            }
             addAudioButton.setText("Record Audio");
             isRecordingAudio = false;
         }
@@ -336,8 +340,6 @@ public class DashboardActivity extends AppCompatActivity implements OnMapReadyCa
         super.onPause();
         if (isRecordingAudio) {
             stopAudioRecording();
-            addAudioButton.setText("Record Audio");
-            isRecordingAudio = false;
         }
     }
 
