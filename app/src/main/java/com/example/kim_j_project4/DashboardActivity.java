@@ -59,8 +59,9 @@ public class DashboardActivity extends AppCompatActivity implements OnMapReadyCa
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Toast.makeText(this, "Loading", Toast.LENGTH_SHORT).show();
+//        checkAndRequestPermissions();
         super.onCreate(savedInstanceState);
+        Toast.makeText(this, "Loading", Toast.LENGTH_SHORT).show();
         ActivityDashboardBinding binding = ActivityDashboardBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
