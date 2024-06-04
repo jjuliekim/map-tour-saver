@@ -248,8 +248,9 @@ public class DashboardActivity extends AppCompatActivity implements OnMapReadyCa
                 }
             }
             if (allPermissionsGranted) {
-                Toast.makeText(this, "All permissions granted", Toast.LENGTH_SHORT).show();
+                Log.i("HERE DASHBOARD", "all perms granted");
             } else {
+                Log.i("HERE DASHBOARD", "perms denied");
                 Toast.makeText(this, "Permissions denied", Toast.LENGTH_SHORT).show();
             }
         }
