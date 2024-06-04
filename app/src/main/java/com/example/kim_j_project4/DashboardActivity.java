@@ -59,6 +59,7 @@ public class DashboardActivity extends AppCompatActivity implements OnMapReadyCa
     private MediaRecorder recorder;
     private Button addAudioButton;
     private Button addVideoButton;
+    private boolean isRecordingAudio = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,12 +91,14 @@ public class DashboardActivity extends AppCompatActivity implements OnMapReadyCa
         // add audio button
         addAudioButton = findViewById(R.id.add_audio_button);
         addAudioButton.setOnClickListener(v -> {
-            if (recorder == null) {
+            if (!isRecordingAudio) {
                 recordAudio();
                 addAudioButton.setText("Stop Recording");
+                isRecordingAudio = true;
             } else {
                 stopAudioRecording();
                 addAudioButton.setText("Record Audio");
+                isRecordingAudio = false;
             }
         });
 
@@ -324,10 +327,14 @@ public class DashboardActivity extends AppCompatActivity implements OnMapReadyCa
     }
 
     private void stopAudioRecording() {
-        recorder.stop();
-        recorder.release();
-        recorder = null;
-        Toast.makeText(this, "Audio Recorded", Toast.LENGTH_SHORT).show();
+        if (recorder != null) {
+            recorder.stop();
+            recorder.release();
+            recorder = null;
+            Toast.makeText(this, "Audio Recorded", Toast.LENGTH_SHORT).show();
+            addAudioButton.setText("Record Audio");
+            isRecordingAudio = false;
+        }
     }
 
     @Override
@@ -366,8 +373,10 @@ public class DashboardActivity extends AppCompatActivity implements OnMapReadyCa
     @Override
     protected void onPause() {
         super.onPause();
-        if (recorder != null) {
+        if (isRecordingAudio) {
             stopAudioRecording();
+            addAudioButton.setText("Record Audio");
+            isRecordingAudio = false;
         }
     }
 
