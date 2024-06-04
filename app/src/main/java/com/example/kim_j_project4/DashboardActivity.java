@@ -6,7 +6,6 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.core.content.FileProvider;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.Manifest;
@@ -14,14 +13,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
-import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.media.MediaRecorder;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
@@ -45,7 +42,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -130,37 +126,6 @@ public class DashboardActivity extends AppCompatActivity implements OnMapReadyCa
         });
     }
 
-    /*@Override
-    public void onMapReady(GoogleMap googleMap) {
-        mMap = googleMap;
-        // check permissions
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
-            return;
-        }
-        // get user's current location and move camera there
-        mMap.setMyLocationEnabled(true);
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, new LocationListener() {
-            @Override
-            public void onLocationChanged(@NonNull Location location) {
-                LatLng currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLocation, 10));
-                locationManager.removeUpdates(this);
-            }
-        });
-        // restore marked locations
-        ArrayList<LatLng> savedLocations = dashboardViewModel.getLocations().getValue();
-        if (savedLocations != null) {
-            for (LatLng location : savedLocations) {
-                mMap.addMarker(new MarkerOptions().position(location));
-            }
-        }
-
-        // allow users to mark locations of interest on the map (store that in ViewModel)
-        mMap.setOnMapClickListener(location -> dashboardViewModel.addLocation(location));
-    }*/
-
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
@@ -179,7 +144,7 @@ public class DashboardActivity extends AppCompatActivity implements OnMapReadyCa
 
         // check for valid entries
         if (tourName.isEmpty() || tourDescription.isEmpty() || locations == null || locations.isEmpty()) {
-            Toast.makeText(this, "Empty Entries", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Empty Tour Entries", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -211,6 +176,7 @@ public class DashboardActivity extends AppCompatActivity implements OnMapReadyCa
                 startActivityForResult(intent, 101);
                 addAudioButton.setVisibility(View.INVISIBLE);
             } catch (Exception e) {
+                Toast.makeText(this, "Unable To Record", Toast.LENGTH_SHORT).show();
                 Log.i("HERE DASHBOARD", "record video e: " + e.getMessage());
             }
         } else {
@@ -240,52 +206,19 @@ public class DashboardActivity extends AppCompatActivity implements OnMapReadyCa
         }
     }
 
-    /*@Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == 103) {
-            boolean allPermissionsGranted = true;
-            for (int result : grantResults) {
-                if (result != PackageManager.PERMISSION_GRANTED) {
-                    allPermissionsGranted = false;
-                    break;
-                }
-            }
-            if (allPermissionsGranted) {
-                Log.i("HERE DASHBOARD", "all perms granted");
-            } else {
-                Log.i("HERE DASHBOARD", "perms denied");
-                Toast.makeText(this, "Permissions denied - Restart", Toast.LENGTH_SHORT).show();
-            }
-        }
-    }*/
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == 200) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // Permission granted, start audio recording
                 startAudioRecording();
             } else {
-                // Permission denied, show a message or handle accordingly
-                Toast.makeText(this, "Permission Denied for Audio Recording", Toast.LENGTH_SHORT).show();
+                Log.i("HERE DASHBOARD", "no audio perms");
+                Toast.makeText(this, "Audio Permissions Denied", Toast.LENGTH_SHORT).show();
             }
         }
         if (requestCode == 103) {
-            boolean allPermissionsGranted = true;
-            for (int result : grantResults) {
-                if (result != PackageManager.PERMISSION_GRANTED) {
-                    allPermissionsGranted = false;
-                    break;
-                }
-            }
-            if (allPermissionsGranted) {
-                Log.i("HERE DASHBOARD", "all permissions granted");
-                enableLocationUpdates();
-            } else {
-                Log.i("HERE DASHBOARD", "permissions denied");
-                Toast.makeText(this, "Permissions Denied - Restart", Toast.LENGTH_SHORT).show();
-            }
+            enableLocationUpdates();
         }
     }
 
@@ -323,7 +256,7 @@ public class DashboardActivity extends AppCompatActivity implements OnMapReadyCa
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
             requestAudioRecordingPermission();
             Log.i("HERE DASHBOARD", "need record audio perms");
-            Toast.makeText(this, "Need Permission", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Audio Permission Needed", Toast.LENGTH_SHORT).show();
         } else {
             addVideoButton.setVisibility(View.INVISIBLE);
             startAudioRecording();
@@ -359,7 +292,7 @@ public class DashboardActivity extends AppCompatActivity implements OnMapReadyCa
             try {
                 recorder.stop();
                 recorder.release();
-                Toast.makeText(this, "Audio Recorded", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Audio Saved", Toast.LENGTH_SHORT).show();
             } catch (RuntimeException e) {
                 Log.e("HERE DASHBOARD", "stop() failed", e);
             } finally {
