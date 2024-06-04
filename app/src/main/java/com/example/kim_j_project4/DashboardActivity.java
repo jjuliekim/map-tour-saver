@@ -337,7 +337,7 @@ public class DashboardActivity extends AppCompatActivity implements OnMapReadyCa
 
     // start audio recording
     private void startAudioRecording() {
-        String audioPath = getExternalCacheDir().getAbsolutePath() + username + "_audio.mp3";
+        String audioPath = getExternalCacheDir().getAbsolutePath() + "_" + System.currentTimeMillis() + username + "_audio.3gp";
         Log.i("HERE DASHBOARD", "audio path: " + audioPath);
         mediaPath = audioPath;
         recorder = new MediaRecorder();

@@ -151,7 +151,7 @@ public class TourDetailsActivity extends AppCompatActivity {
 
     // play audio
     private void playAudio() {
-        if (!tour.getMediaPath().startsWith("audio")) {
+        if (!tour.getMediaPath().endsWith(".3gp")) {
             Log.i("HERE TOUR DETAILS", "not audio");
             return;
         }
