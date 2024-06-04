@@ -199,11 +199,6 @@ public class DashboardActivity extends AppCompatActivity implements OnMapReadyCa
 
     // record video
     private void recordVideo() {
-        /*if (!checkAndRequestPermissions()) {
-            Log.i("HERE DASHBOARD", "no perms");
-            Toast.makeText(this, "No Perms", Toast.LENGTH_SHORT).show();
-            return;
-        }*/
         if (getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)) {
             try {
                 Intent intent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
@@ -260,7 +255,7 @@ public class DashboardActivity extends AppCompatActivity implements OnMapReadyCa
     private void recordAudio() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED ||
                 ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 102);
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 103);
         } else {
             addVideoButton.setVisibility(View.INVISIBLE);
             startAudioRecording();
