@@ -80,7 +80,6 @@ public class DashboardActivity extends AppCompatActivity implements OnMapReadyCa
 
         dashboardViewModel = new ViewModelProvider(this).get(DashboardViewModel.class);
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        checkAndRequestPermissions();
         mediaPath = "";
         loadTours();
 
@@ -133,6 +132,7 @@ public class DashboardActivity extends AppCompatActivity implements OnMapReadyCa
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        checkAndRequestPermissions();
         // check permissions
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -250,7 +250,7 @@ public class DashboardActivity extends AppCompatActivity implements OnMapReadyCa
                 Log.i("HERE DASHBOARD", "all perms granted");
             } else {
                 Log.i("HERE DASHBOARD", "perms denied");
-                Toast.makeText(this, "Permissions denied", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Permissions denied - Restart", Toast.LENGTH_SHORT).show();
             }
         }
     }
