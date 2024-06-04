@@ -59,7 +59,6 @@ public class DashboardActivity extends AppCompatActivity implements OnMapReadyCa
     private MediaRecorder recorder;
     private Button addAudioButton;
     private Button addVideoButton;
-    private Uri videoUri;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,7 +88,15 @@ public class DashboardActivity extends AppCompatActivity implements OnMapReadyCa
 
         // add audio button
         addAudioButton = findViewById(R.id.add_audio_button);
-        addAudioButton.setOnClickListener(v -> recordAudio());
+        addAudioButton.setOnClickListener(v -> {
+            if (recorder == null) {
+                recordAudio();
+                addAudioButton.setText("Stop Recording");
+            } else {
+                stopAudioRecording();
+                addAudioButton.setText("Record Audio");
+            }
+        });
 
         // save tour button
         Button saveButton = findViewById(R.id.save_tour_button);
